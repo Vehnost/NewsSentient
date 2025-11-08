@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SentientNews | AI-Powered News Aggregator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary-color: #121212;
+            --accent-color: #667eea;
+            --bg-color: #ffffff;
+            --text-color: #121212;
+            --border-color: #e5e5e5;
+            --hover-color: #f8f8f8;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+        
+        /* Header */
+        .header {
+            background: #ffffff;
+            border-bottom: 3px double var(--primary-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .header-top {
+            border-bottom: 1px solid var(--border-color);
+            padding: 10px 0;
+            background: #f8f8f8;
+        }
+        
+        .header-top-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #666;
+        }
+        
+        .live-badge {
+            background: var(--accent-color);
+            color: white;
+            padding: 3px 10px;
+            border-radius: 3px;
+            font-weight: 700;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .header-main {
+            padding: 30px 0;
+            text-align: center;
+        }
+        
+        .site-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 4em;
+            font-weight: 900;
+            color: var(--primary-color);
+            letter-spacing: -2px;
+            margin-bottom: 5px;
+        }
+        
+        .site-subtitle {
+            font-size: 13px;
+            color: #666;
+            font-style: italic;
+            letter-spacing: 1px;
+        }
+        
+        /* Navigation */
+        .nav {
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            background: white;
+            overflow-x: auto;
+        }
+        
+        .nav-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+        }
+        
+        .nav-item {
+            padding: 12px 0;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--primary-color);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+        
+        .nav-item:hover {
+            border-bottom-color: var(--accent-color);
+        }
+        
+        .nav-item.active {
+            border-bottom-color: var(--primary-color);
+        }
+        
+        /* Main Content */
+        .container {
+            max-width: 1400px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--primary-color);
+        }
+        
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2em;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        
+        /* Loading State */
+        .loading {
+            text-align: center;
+            padding: 80px 20px;
+            color: #666;
+        }
+        
+        .loader {
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--accent-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* News Grid */
+        .news-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+        
+        .news-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .news-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .news-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            background: #f0f0f0;
+        }
+        
+        .news-image-placeholder {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3em;
+            color: white;
+        }
+        
+        .news-content {
+            padding: 20px;
+        }
+        
+        .news-category {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--accent-color);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+        
+        .news-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4em;
+            font-weight: 700;
+            color: var(--primary-color);
+            line-height: 1.3;
+            margin-bottom: 12px;
+            transition: color 0.3s;
+        }
+        
+        .news-card:hover .news-title {
+            color: var(--accent-color);
+        }
+        
+        .news-description {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .news-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #999;
+        }
+        
+        .news-source {
+            font-weight: 600;
+            color: #666;
+        }
+        
+        .news-time {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .badge {
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        
+        .badge-live {
+            background: #e63946;
+            color: white;
+            animation: pulse 2s infinite;
+        }
+        
+        .badge-hot {
+            background: #ff6b6b;
+            color: white;
+        }
+        
+        .badge-new {
+            background: #4caf50;
+            color: white;
+        }
+        
+        /* Featured Article */
+        .featured-article {
+            border: 2px solid var(--primary-color);
+            padding: 40px;
+            margin-bottom: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+        
+        .featured-article:hover {
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+        }
+        
+        .featured-image {
+            width: 100%;
+            height: 450px;
+            object-fit: cover;
+        }
+        
+        .featured-content .news-category {
+            font-size: 13px;
+        }
+        
+        .featured-content .news-title {
+            font-size: 2.8em;
+            margin-bottom: 20px;
+        }
+        
+        .featured-content .news-description {
+            font-size: 18px;
+            line-height: 1.7;
+            -webkit-line-clamp: 6;
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: #999;
+        }
+        
+        .empty-state-icon {
+            font-size: 5em;
+            margin-bottom: 20px;
+        }
+        
+        /* Footer */
+        .footer {
+            background: var(--primary-color);
+            color: white;
+            padding: 50px 20px 30px;
+            margin-top: 100px;
+            border-top: 3px solid var(--accent-color);
+        }
+        
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        
+        .footer-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5em;
+            font-weight: 900;
+            margin-bottom: 10px;
+        }
+        
+        .footer-text {
+            font-size: 14px;
+            opacity: 0.8;
+            margin-top: 10px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .news-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .site-title {
+                font-size: 2.5em;
+            }
+            
+            .nav-content {
+                justify-content: flex-start;
+                gap: 20px;
+            }
+            
+            .news-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .featured-article {
+                grid-template-columns: 1fr;
+                padding: 25px;
+            }
+            
+            .featured-image {
+                height: 250px;
+            }
+            
+            .featured-content .news-title {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-top">
+            <div class="header-top-content">
+                <div>
+                    <span class="live-badge">● LIVE</span>
+                    <span style="margin-left: 15px;">Real-time updates from 40+ sources</span>
+                </div>
+                <div id="currentDate"></div>
+            </div>
+        </div>
+        
+        <div class="header-main">
+            <h1 class="site-title">SentientNews</h1>
+            <p class="site-subtitle">"All the News That's Fit to Aggregate"</p>
+        </div>
+        
+        <nav class="nav">
+            <div class="nav-content">
+                <div class="nav-item active" data-category="crypto">₿ Cryptocurrency</div>
+                <div class="nav-item" data-category="ai">🤖 Artificial Intelligence</div>
+                <div class="nav-item" data-category="technology">💻 Technology</div>
+                <div class="nav-item" data-category="finance">📈 Finance</div>
+            </div>
+        </nav>
+    </header>
+    
+    <!-- Main Content -->
+    <main class="container">
+        <!-- Loading State -->
+        <div id="loadingState" class="loading">
+            <div class="loader"></div>
+            <p>Loading latest news from 40+ authoritative sources...</p>
+        </div>
+        
+        <!-- Section Header -->
+        <div id="sectionHeader" style="display: none;">
+            <div class="section-header">
+                <h2 class="section-title" id="sectionTitle">Latest Cryptocurrency News</h2>
+            </div>
+        </div>
+        
+        <!-- Featured Article -->
+        <div id="featuredSection" style="display: none;">
+            <div id="featuredArticle"></div>
+        </div>
+        
+        <!-- News Grid -->
+        <div id="newsGrid" class="news-grid" style="display: none;"></div>
+        
+        <!-- Empty State -->
+        <div id="emptyState" class="empty-state" style="display: none;">
+            <div class="empty-state-icon">📭</div>
+            <p class="empty-state-text">No news articles found</p>
+        </div>
+    </main>
+    
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <h2 class="footer-title">SentientNews</h2>
+            <p class="footer-text">AI-Powered News Aggregation | 40+ Authoritative Sources</p>
+            <p class="footer-text" style="margin-top: 20px; opacity: 0.6;">© 2025 SentientNews. Powered by Sentient Agent Framework</p>
+        </div>
+    </footer>
+
+    <script>
+        const API_URL = 'http://localhost:8000';
+        let currentCategory = 'crypto';
+        let allArticles = [];
+        
+        // Set current date
+        const dateOptions = { 
+            weekday: 'long', 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+        };
+        document.getElementById('currentDate').textContent = 
+            new Date().toLocaleDateString('en-US', dateOptions);
+        
+        // Navigation
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', () => {
+                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                item.classList.add('active');
+                currentCategory = item.dataset.category;
+                loadNews();
+            });
+        });
+        
+        // Load news
+        async function loadNews() {
+            showLoading();
+            
+            try {
+                const response = await fetch(`${API_URL}/v1/query/news`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        categories: [currentCategory],
+                        max_results: 50
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to fetch news');
+                }
+                
+                const data = await response.json();
+                allArticles = data.articles.sort((a, b) => 
+                    new Date(b.published_at) - new Date(a.published_at)
+                );
+                
+                displayNews(allArticles);
+                
+            } catch (error) {
+                console.error('Error loading news:', error);
+                showEmpty();
+            }
+        }
+        
+        function showLoading() {
+            document.getElementById('loadingState').style.display = 'block';
+            document.getElementById('sectionHeader').style.display = 'none';
+            document.getElementById('featuredSection').style.display = 'none';
+            document.getElementById('newsGrid').style.display = 'none';
+            document.getElementById('emptyState').style.display = 'none';
+        }
+        
+        function showEmpty() {
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('sectionHeader').style.display = 'none';
+            document.getElementById('featuredSection').style.display = 'none';
+            document.getElementById('newsGrid').style.display = 'none';
+            document.getElementById('emptyState').style.display = 'block';
+        }
+        
+        function displayNews(articles) {
+            if (!articles || articles.length === 0) {
+                showEmpty();
+                return;
+            }
+            
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('emptyState').style.display = 'none';
+            document.getElementById('sectionHeader').style.display = 'block';
+            
+            // Update title
+            const titles = {
+                'crypto': 'Latest Cryptocurrency News',
+                'ai': 'Artificial Intelligence Updates',
+                'technology': 'Technology News',
+                'finance': 'Financial Markets'
+            };
+            document.getElementById('sectionTitle').textContent = titles[currentCategory] || 'Latest News';
+            
+            // Featured article
+            if (articles.length > 0) {
+                document.getElementById('featuredSection').style.display = 'block';
+                document.getElementById('featuredArticle').innerHTML = createFeaturedCard(articles[0]);
+            }
+            
+            // News grid
+            document.getElementById('newsGrid').style.display = 'grid';
+            document.getElementById('newsGrid').innerHTML = articles
+                .slice(1)
+                .map(article => createNewsCard(article))
+                .join('');
+        }
+        
+        function createFeaturedCard(article) {
+            const imageHtml = article.image_url 
+                ? `<img src="${escapeHtml(article.image_url)}" alt="${escapeHtml(article.title)}" class="featured-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                   <div class="news-image-placeholder" style="display: none; height: 450px;">📰</div>`
+                : `<div class="news-image-placeholder" style="height: 450px;">📰</div>`;
+            
+            const timeInfo = getTimeInfo(article.published_at);
+            
+            return `
+                <div class="featured-article" onclick="openArticle('${escapeHtml(article.url)}')">
+                    ${imageHtml}
+                    <div class="featured-content">
+                        <div class="news-category">${getCategoryName(currentCategory)}</div>
+                        <h2 class="news-title">${escapeHtml(article.title)}</h2>
+                        <p class="news-description">${escapeHtml(article.description || 'Click to read the full article...')}</p>
+                        <div class="news-meta">
+                            <span class="news-source">${escapeHtml(article.source)}</span>
+                            <div class="news-time">
+                                ${timeInfo.badge}
+                                <span>${timeInfo.text}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function createNewsCard(article) {
+            const imageHtml = article.image_url 
+                ? `<img src="${escapeHtml(article.image_url)}" alt="${escapeHtml(article.title)}" class="news-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                   <div class="news-image-placeholder" style="display: none;">📰</div>`
+                : `<div class="news-image-placeholder">📰</div>`;
+            
+            const timeInfo = getTimeInfo(article.published_at);
+            
+            return `
+                <div class="news-card" onclick="openArticle('${escapeHtml(article.url)}')">
+                    ${imageHtml}
+                    <div class="news-content">
+                        <div class="news-category">${getCategoryName(currentCategory)}</div>
+                        <h3 class="news-title">${escapeHtml(article.title)}</h3>
+                        <p class="news-description">${escapeHtml(truncate(article.description || '', 150))}</p>
+                        <div class="news-meta">
+                            <span class="news-source">${escapeHtml(article.source)}</span>
+                            <div class="news-time">
+                                ${timeInfo.badge}
+                                <span>${timeInfo.text}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function getTimeInfo(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMs / 3600000);
+            const diffDays = Math.floor(diffMs / 86400000);
+            
+            if (diffMins < 1) {
+                return { badge: '<span class="badge badge-live">🔥 LIVE</span>', text: 'Just now' };
+            } else if (diffMins < 30) {
+                return { badge: '<span class="badge badge-hot">HOT</span>', text: `${diffMins}m ago` };
+            } else if (diffHours < 3) {
+                return { badge: '<span class="badge badge-new">NEW</span>', text: `${diffHours}h ago` };
+            } else if (diffHours < 24) {
+                return { badge: '', text: `${diffHours}h ago` };
+            } else if (diffDays < 7) {
+                return { badge: '', text: `${diffDays}d ago` };
+            } else {
+                return { badge: '', text: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) };
+            }
+        }
+        
+        function openArticle(url) {
+            window.open(url, '_blank');
+        }
+        
+        function getCategoryName(category) {
+            const names = {
+                'crypto': 'Cryptocurrency',
+                'ai': 'Artificial Intelligence',
+                'technology': 'Technology',
+                'finance': 'Finance'
+            };
+            return names[category] || category;
+        }
+        
+        function truncate(text, length) {
+            if (!text) return '';
+            return text.length > length ? text.substring(0, length) + '...' : text;
+        }
+        
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // Load initial news
+        loadNews();
+        
+        // Auto-refresh every 5 minutes
+        setInterval(loadNews, 5 * 60 * 1000);
+    </script>
+</body>
+</html>
