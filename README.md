@@ -2,6 +2,12 @@
 
 AI-powered news aggregator with intelligent chat assistant. Get the latest crypto, AI, and tech news from 40+ authoritative sources with real-time updates and smart filtering.
 
+## 🌐 Live Demo
+
+**👉 [View Live Demo](https://vehnost.github.io/NewsSentient/examples/news_aggregator.html) 👈**
+
+Try it now! No installation required.
+
 ## 🎯 Features
 
 - 🤖 **AI Chat Assistant** - Ask about any company or topic
