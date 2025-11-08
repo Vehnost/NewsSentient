@@ -4,7 +4,7 @@ AI-powered news aggregator with intelligent chat assistant. Get the latest crypt
 
 ## 🌐 Live Demo
 
-**👉 [View Live Demo](https://vehnost.github.io/NewsSentient/examples/news_aggregator.html) 👈**
+**👉 [View Live Demo](https://vehnost.github.io/NewsSentient/examples/news_aggregator.html) 👈** You need to give network permission for it to work!
 
 Try it now! No installation required.
 
