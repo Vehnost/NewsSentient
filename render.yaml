@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: news-ai-agent
+    env: python
+    region: oregon
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT --workers 2
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10.0
+      - key: HOST
+        value: 0.0.0.0
+      - key: DEBUG
+        value: False
+      - key: ENABLE_RSS
+        value: True
+      - key: ENABLE_NEWS_API
+        value: False
+      - key: MAX_NEWS_ITEMS
+        value: 50

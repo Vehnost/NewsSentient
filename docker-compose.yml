@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  sentient-news-agent:
+    build: .
+    container_name: sentient-news-agent
+    ports:
+      - "8000:8000"
+    environment:
+      - HOST=0.0.0.0
+      - PORT=8000
+      - DEBUG=False
+    env_file:
+      - .env
+    volumes:
+      - ./logs:/app/logs
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - sentient-network
+
+networks:
+  sentient-network:
+    driver: bridge
